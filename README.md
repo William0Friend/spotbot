@@ -28,7 +28,7 @@ Technology Stack:
 
 Implementation Phase 1: Core Infrastructure
 
-    Set up Node.js backend with Express
+    Set up Laravel
     Configure PostgreSQL database schema
     Implement basic API endpoints
     Add authentication system
