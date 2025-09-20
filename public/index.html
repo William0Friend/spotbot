@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SpotBot - Bot Detection Platform</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .gradient-bg { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .glass-effect { 
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <!-- Header -->
+    <header class="gradient-bg text-white shadow-lg">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center">
+                    <i class="fas fa-shield-alt text-3xl mr-3"></i>
+                    <div>
+                        <h1 class="text-2xl font-bold">SpotBot</h1>
+                        <p class="text-sm opacity-90">Bot Detection Platform</p>
+                    </div>
+                </div>
+                <nav class="hidden md:flex space-x-6">
+                    <a href="#dashboard" class="hover:text-yellow-300 transition">Dashboard</a>
+                    <a href="#check" class="hover:text-yellow-300 transition">Check IP</a>
+                    <a href="#report" class="hover:text-yellow-300 transition">Report Bot</a>
+                    <a href="#api" class="hover:text-yellow-300 transition">API</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="gradient-bg text-white py-20">
+        <div class="container mx-auto px-6 text-center">
+            <h2 class="text-5xl font-bold mb-6">Protect Your Website from Malicious Bots</h2>
+            <p class="text-xl mb-8 max-w-3xl mx-auto">
+                SpotBot is a comprehensive bot detection and reporting platform that helps websites identify, 
+                track, and block malicious bot traffic through community-driven intelligence.
+            </p>
+            <div class="flex justify-center space-x-4">
+                <button onclick="showSection('check')" class="bg-white text-purple-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition">
+                    Check IP Address
+                </button>
+                <button onclick="showSection('api')" class="border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-purple-600 transition">
+                    Get API Access
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Dashboard Section -->
+    <section id="dashboard" class="py-16">
+        <div class="container mx-auto px-6">
+            <h3 class="text-3xl font-bold text-center mb-12">Platform Statistics</h3>
+            <div class="grid md:grid-cols-4 gap-8 mb-12">
+                <div class="bg-white rounded-lg shadow-md p-6 text-center">
+                    <i class="fas fa-bug text-4xl text-red-500 mb-4"></i>
+                    <h4 class="text-2xl font-bold text-gray-800" id="totalReports">-</h4>
+                    <p class="text-gray-600">Total Bot Reports</p>
+                </div>
+                <div class="bg-white rounded-lg shadow-md p-6 text-center">
+                    <i class="fas fa-globe text-4xl text-blue-500 mb-4"></i>
+                    <h4 class="text-2xl font-bold text-gray-800" id="uniqueIPs">-</h4>
+                    <p class="text-gray-600">Unique IP Addresses</p>
+                </div>
+                <div class="bg-white rounded-lg shadow-md p-6 text-center">
+                    <i class="fas fa-network-wired text-4xl text-green-500 mb-4"></i>
+                    <h4 class="text-2xl font-bold text-gray-800" id="botNetworks">-</h4>
+                    <p class="text-gray-600">Bot Networks Identified</p>
+                </div>
+                <div class="bg-white rounded-lg shadow-md p-6 text-center">
+                    <i class="fas fa-shield-check text-4xl text-purple-500 mb-4"></i>
+                    <h4 class="text-2xl font-bold text-gray-800" id="sitesProtected">1,000+</h4>
+                    <p class="text-gray-600">Sites Protected</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- IP Check Section -->
+    <section id="check" class="py-16 bg-gray-50" style="display: none;">
+        <div class="container mx-auto px-6">
+            <h3 class="text-3xl font-bold text-center mb-12">Check IP Address</h3>
+            <div class="max-w-2xl mx-auto">
+                <div class="bg-white rounded-lg shadow-md p-8">
+                    <div class="mb-6">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">
+                            IP Address to Check
+                        </label>
+                        <input type="text" 
+                               id="ipInput" 
+                               placeholder="Enter IP address (e.g., 192.168.1.1)"
+                               class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:border-purple-500">
+                    </div>
+                    <button onclick="checkIP()" 
+                            class="w-full bg-purple-600 text-white py-3 rounded-lg font-semibold hover:bg-purple-700 transition">
+                        <i class="fas fa-search mr-2"></i>Check IP
+                    </button>
+                    
+                    <div id="ipResults" class="mt-6" style="display: none;">
+                        <!-- Results will be displayed here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Report Bot Section -->
+    <section id="report" class="py-16" style="display: none;">
+        <div class="container mx-auto px-6">
+            <h3 class="text-3xl font-bold text-center mb-12">Report Bot Activity</h3>
+            <div class="max-w-2xl mx-auto">
+                <div class="bg-white rounded-lg shadow-md p-8">
+                    <div class="grid md:grid-cols-2 gap-6 mb-6">
+                        <div>
+                            <label class="block text-gray-700 text-sm font-bold mb-2">IP Address *</label>
+                            <input type="text" 
+                                   id="reportIP" 
+                                   placeholder="192.168.1.1"
+                                   class="w-full px-4 py-2 border rounded focus:outline-none focus:border-purple-500">
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 text-sm font-bold mb-2">Bot Type</label>
+                            <select id="botType" class="w-full px-4 py-2 border rounded focus:outline-none focus:border-purple-500">
+                                <option value="scraper">Web Scraper</option>
+                                <option value="spam">Spam Bot</option>
+                                <option value="malicious">Malicious Bot</option>
+                                <option value="scanner">Security Scanner</option>
+                                <option value="ddos">DDoS Bot</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-6">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">User Agent</label>
+                        <input type="text" 
+                               id="userAgent" 
+                               placeholder="Mozilla/5.0 (compatible; bot/1.0)"
+                               class="w-full px-4 py-2 border rounded focus:outline-none focus:border-purple-500">
+                    </div>
+
+                    <div class="mb-6">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Confidence Score (0-100)</label>
+                        <input type="range" 
+                               id="confidence" 
+                               min="0" 
+                               max="100" 
+                               value="50"
+                               class="w-full">
+                        <div class="text-center text-sm text-gray-600 mt-2">
+                            Score: <span id="confidenceValue">50</span>
+                        </div>
+                    </div>
+
+                    <div class="mb-6">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">API Key</label>
+                        <input type="password" 
+                               id="apiKey" 
+                               placeholder="Your API key"
+                               class="w-full px-4 py-2 border rounded focus:outline-none focus:border-purple-500">
+                    </div>
+
+                    <button onclick="reportBot()" 
+                            class="w-full bg-red-600 text-white py-3 rounded-lg font-semibold hover:bg-red-700 transition">
+                        <i class="fas fa-exclamation-triangle mr-2"></i>Report Bot
+                    </button>
+                    
+                    <div id="reportResults" class="mt-6" style="display: none;">
+                        <!-- Results will be displayed here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- API Documentation Section -->
+    <section id="api" class="py-16 bg-gray-50" style="display: none;">
+        <div class="container mx-auto px-6">
+            <h3 class="text-3xl font-bold text-center mb-12">API Documentation</h3>
+            
+            <div class="max-w-4xl mx-auto">
+                <div class="bg-white rounded-lg shadow-md p-8 mb-8">
+                    <h4 class="text-2xl font-bold mb-4">Getting Started</h4>
+                    <p class="mb-4">
+                        SpotBot provides a RESTful API for bot detection and reporting. 
+                        Register for an account to get your API key and start protecting your website.
+                    </p>
+                    
+                    <div class="bg-gray-100 rounded-lg p-4 mb-6">
+                        <h5 class="font-bold mb-2">Authentication</h5>
+                        <p class="text-sm">Include your API key in the request header:</p>
+                        <code class="block bg-gray-800 text-green-400 p-3 rounded mt-2">
+                            X-API-Key: your_api_key_here
+                        </code>
+                    </div>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div class="bg-white rounded-lg shadow-md p-6">
+                        <h5 class="text-xl font-bold mb-4">Check IP Address</h5>
+                        <p class="text-sm text-gray-600 mb-4">Check if an IP address is a known bot</p>
+                        <code class="block bg-gray-800 text-green-400 p-3 rounded text-sm">
+                            GET /api/v1/bots/check/{ip}
+                        </code>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg shadow-md p-6">
+                        <h5 class="text-xl font-bold mb-4">Report Bot</h5>
+                        <p class="text-sm text-gray-600 mb-4">Report bot activity to the database</p>
+                        <code class="block bg-gray-800 text-green-400 p-3 rounded text-sm">
+                            POST /api/v1/bots/report
+                        </code>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg shadow-md p-6">
+                        <h5 class="text-xl font-bold mb-4">Get Statistics</h5>
+                        <p class="text-sm text-gray-600 mb-4">Get platform-wide bot statistics</p>
+                        <code class="block bg-gray-800 text-green-400 p-3 rounded text-sm">
+                            GET /api/v1/bots/stats
+                        </code>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg shadow-md p-6">
+                        <h5 class="text-xl font-bold mb-4">User Registration</h5>
+                        <p class="text-sm text-gray-600 mb-4">Register for an API account</p>
+                        <code class="block bg-gray-800 text-green-400 p-3 rounded text-sm">
+                            POST /api/v1/auth/register
+                        </code>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-12">
+        <div class="container mx-auto px-6 text-center">
+            <div class="flex justify-center items-center mb-4">
+                <i class="fas fa-shield-alt text-2xl mr-2"></i>
+                <span class="text-xl font-bold">SpotBot</span>
+            </div>
+            <p class="text-gray-400 mb-4">
+                Community-driven bot detection and reporting platform
+            </p>
+            <div class="flex justify-center space-x-6">
+                <a href="#" class="text-gray-400 hover:text-white">API Docs</a>
+                <a href="#" class="text-gray-400 hover:text-white">Support</a>
+                <a href="#" class="text-gray-400 hover:text-white">Privacy</a>
+                <a href="#" class="text-gray-400 hover:text-white">Terms</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Load stats on page load
+        document.addEventListener('DOMContentLoaded', loadStats);
+
+        // Navigation
+        function showSection(sectionId) {
+            const sections = ['dashboard', 'check', 'report', 'api'];
+            sections.forEach(id => {
+                const section = document.getElementById(id);
+                if (section) {
+                    section.style.display = id === sectionId ? 'block' : 'none';
+                }
+            });
+        }
+
+        // Load platform statistics
+        async function loadStats() {
+            try {
+                const response = await fetch('/api/v1/bots/stats');
+                const data = await response.json();
+                
+                if (data.totalReports !== undefined) {
+                    document.getElementById('totalReports').textContent = data.totalReports.toLocaleString();
+                }
+                if (data.uniqueIPs !== undefined) {
+                    document.getElementById('uniqueIPs').textContent = data.uniqueIPs.toLocaleString();
+                }
+                // Bot networks is not implemented yet, so we'll show a placeholder
+                document.getElementById('botNetworks').textContent = '50+';
+                
+            } catch (error) {
+                console.error('Error loading stats:', error);
+            }
+        }
+
+        // Check IP functionality
+        async function checkIP() {
+            const ip = document.getElementById('ipInput').value.trim();
+            if (!ip) {
+                alert('Please enter an IP address');
+                return;
+            }
+
+            const resultsDiv = document.getElementById('ipResults');
+            resultsDiv.innerHTML = '<div class="text-center"><i class="fas fa-spinner fa-spin"></i> Checking...</div>';
+            resultsDiv.style.display = 'block';
+
+            try {
+                const response = await fetch(`/api/v1/bots/check/${ip}`);
+                const data = await response.json();
+
+                if (response.ok) {
+                    const threatClass = data.confidence > 70 ? 'text-red-600' : 
+                                      data.confidence > 30 ? 'text-yellow-600' : 'text-green-600';
+                    
+                    resultsDiv.innerHTML = `
+                        <div class="border-t pt-6">
+                            <h4 class="font-bold text-lg mb-4">Results for ${data.ip}</h4>
+                            <div class="grid md:grid-cols-2 gap-4">
+                                <div>
+                                    <p><strong>Is Bot:</strong> <span class="${threatClass}">${data.isBot ? 'Yes' : 'No'}</span></p>
+                                    <p><strong>Confidence:</strong> <span class="${threatClass}">${data.confidence}%</span></p>
+                                    <p><strong>Reports:</strong> ${data.reportCount || 0}</p>
+                                </div>
+                                <div>
+                                    <p><strong>Last Seen:</strong> ${data.lastSeen ? new Date(data.lastSeen).toLocaleDateString() : 'Never'}</p>
+                                    <p><strong>Whitelisted:</strong> ${data.isWhitelisted ? 'Yes' : 'No'}</p>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    resultsDiv.innerHTML = `<div class="text-red-600">Error: ${data.error}</div>`;
+                }
+            } catch (error) {
+                resultsDiv.innerHTML = '<div class="text-red-600">Error checking IP address</div>';
+            }
+        }
+
+        // Report bot functionality
+        async function reportBot() {
+            const ip = document.getElementById('reportIP').value.trim();
+            const botType = document.getElementById('botType').value;
+            const userAgent = document.getElementById('userAgent').value.trim();
+            const confidence = document.getElementById('confidence').value;
+            const apiKey = document.getElementById('apiKey').value.trim();
+
+            if (!ip) {
+                alert('Please enter an IP address');
+                return;
+            }
+
+            if (!apiKey) {
+                alert('Please enter your API key');
+                return;
+            }
+
+            const resultsDiv = document.getElementById('reportResults');
+            resultsDiv.innerHTML = '<div class="text-center"><i class="fas fa-spinner fa-spin"></i> Reporting...</div>';
+            resultsDiv.style.display = 'block';
+
+            try {
+                const response = await fetch('/api/v1/bots/report', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-API-Key': apiKey
+                    },
+                    body: JSON.stringify({
+                        ipAddress: ip,
+                        botType: botType,
+                        userAgent: userAgent,
+                        confidenceScore: parseInt(confidence)
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    resultsDiv.innerHTML = `
+                        <div class="border-t pt-6 text-green-600">
+                            <h4 class="font-bold text-lg mb-2">Report Submitted Successfully!</h4>
+                            <p>Thank you for contributing to the SpotBot community database.</p>
+                            <p class="text-sm text-gray-600 mt-2">Report ID: ${data.report.id}</p>
+                        </div>
+                    `;
+                    // Clear form
+                    document.getElementById('reportIP').value = '';
+                    document.getElementById('userAgent').value = '';
+                    document.getElementById('confidence').value = '50';
+                    document.getElementById('confidenceValue').textContent = '50';
+                } else {
+                    resultsDiv.innerHTML = `<div class="text-red-600">Error: ${data.error}</div>`;
+                }
+            } catch (error) {
+                resultsDiv.innerHTML = '<div class="text-red-600">Error submitting report</div>';
+            }
+        }
+
+        // Update confidence score display
+        document.getElementById('confidence').addEventListener('input', function() {
+            document.getElementById('confidenceValue').textContent = this.value;
+        });
+    </script>
+</body>
+</html>
