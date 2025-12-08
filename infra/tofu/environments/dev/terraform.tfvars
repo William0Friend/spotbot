@@ -1,0 +1,5 @@
+environment = "dev"
+region      = "nyc3"
+droplet_size = "s-2vcpu-2gb"
+db_size     = "db-s-1vcpu-1gb"
+domain      = "dev.spotbot.example.com"

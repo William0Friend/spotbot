@@ -1,0 +1,69 @@
+---
+# Ansible Playbook: Deploy SpotBot Application
+# Usage: ansible-playbook -i inventories/dev deploy.yml
+
+- name: Deploy SpotBot Application
+  hosts: app_servers
+  become: yes
+  vars:
+    app_dir: /opt/spotbot
+    git_repo: "https://github.com/William0Friend/spotbot.git"
+    git_branch: "main"
+    
+  tasks:
+    - name: Ensure application directory exists
+      file:
+        path: "{{ app_dir }}"
+        state: directory
+        owner: ubuntu
+        group: ubuntu
+        mode: '0755'
+    
+    - name: Clone or update repository
+      git:
+        repo: "{{ git_repo }}"
+        dest: "{{ app_dir }}"
+        version: "{{ git_branch }}"
+        force: yes
+      become_user: ubuntu
+    
+    - name: Copy environment file
+      template:
+        src: templates/env.j2
+        dest: "{{ app_dir }}/.env"
+        owner: ubuntu
+        group: ubuntu
+        mode: '0600'
+    
+    - name: Pull latest Docker images
+      community.docker.docker_compose:
+        project_src: "{{ app_dir }}"
+        pull: yes
+      become_user: ubuntu
+    
+    - name: Stop existing containers
+      community.docker.docker_compose:
+        project_src: "{{ app_dir }}"
+        state: absent
+      become_user: ubuntu
+      ignore_errors: yes
+    
+    - name: Start SpotBot containers
+      community.docker.docker_compose:
+        project_src: "{{ app_dir }}"
+        state: present
+        build: yes
+      become_user: ubuntu
+    
+    - name: Wait for application to be healthy
+      uri:
+        url: "http://localhost:8000/health"
+        status_code: 200
+      register: result
+      until: result.status == 200
+      retries: 30
+      delay: 2
+    
+    - name: Display deployment status
+      debug:
+        msg: "SpotBot deployed successfully on {{ inventory_hostname }}"

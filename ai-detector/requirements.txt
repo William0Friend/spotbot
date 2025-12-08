@@ -1,0 +1,9 @@
+fastapi==0.109.0
+uvicorn[standard]==0.27.0
+pydantic==2.5.3
+numpy==1.26.3
+transformers==4.36.2
+torch==2.1.2
+pillow==10.2.0
+requests==2.31.0
+beautifulsoup4==4.12.3

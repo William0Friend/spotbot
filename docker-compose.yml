@@ -1,0 +1,89 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: spotbot-postgres
+    environment:
+      POSTGRES_USER: spotbot
+      POSTGRES_PASSWORD: spotbot_dev_password
+      POSTGRES_DB: spotbot
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U spotbot"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: spotbot-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: spotbot-backend
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://spotbot:spotbot_dev_password@postgres:5432/spotbot
+      - REDIS_URL=redis://redis:6379
+      - AI_DETECTOR_URL=http://ai-detector:8001
+      - SECRET_KEY=dev-secret-key-change-in-production
+      - ENVIRONMENT=development
+    volumes:
+      - ./backend/app:/app/app
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+  ai-detector:
+    build:
+      context: ./ai-detector
+      dockerfile: Dockerfile
+    container_name: spotbot-ai-detector
+    ports:
+      - "8001:8001"
+    environment:
+      - MODEL_CACHE_DIR=/models
+      - ENVIRONMENT=development
+    volumes:
+      - ./ai-detector/app:/app/app
+      - model_cache:/models
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8001 --reload
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: spotbot-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - VITE_API_URL=http://localhost:8000
+    volumes:
+      - ./frontend/src:/app/src
+      - ./frontend/index.html:/app/index.html
+    command: npm run dev -- --host 0.0.0.0
+
+volumes:
+  postgres_data:
+  redis_data:
+  model_cache:

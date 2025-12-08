@@ -1,0 +1,60 @@
+#cloud-config
+# Cloud-init configuration for SpotBot application server
+
+packages:
+  - apt-transport-https
+  - ca-certificates
+  - curl
+  - gnupg
+  - lsb-release
+  - python3
+  - python3-pip
+  - git
+
+package_update: true
+package_upgrade: true
+
+write_files:
+  - path: /etc/systemd/system/spotbot.service
+    content: |
+      [Unit]
+      Description=SpotBot Application
+      Requires=docker.service
+      After=docker.service
+      
+      [Service]
+      Type=oneshot
+      RemainAfterExit=yes
+      WorkingDirectory=/opt/spotbot
+      ExecStart=/usr/local/bin/docker-compose up -d
+      ExecStop=/usr/local/bin/docker-compose down
+      
+      [Install]
+      WantedBy=multi-user.target
+
+runcmd:
+  # Install Docker
+  - curl -fsSL https://get.docker.com -o get-docker.sh
+  - sh get-docker.sh
+  - usermod -aG docker ubuntu
+  
+  # Install Docker Compose
+  - curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+  - chmod +x /usr/local/bin/docker-compose
+  
+  # Create application directory
+  - mkdir -p /opt/spotbot
+  - chown ubuntu:ubuntu /opt/spotbot
+  
+  # Configure firewall
+  - ufw allow 22/tcp
+  - ufw allow 80/tcp
+  - ufw allow 443/tcp
+  - ufw allow 8000/tcp
+  - ufw --force enable
+  
+  # Enable and start Docker
+  - systemctl enable docker
+  - systemctl start docker
+  
+final_message: "SpotBot server is ready for deployment"

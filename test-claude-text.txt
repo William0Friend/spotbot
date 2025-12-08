@@ -1,0 +1,9 @@
+Nice idea — high-impact and hard in all the right ways. I'll lay out a practical, citation-backed plan you can build from: what the product is, how detection/attribution actually works today (and its limits), a concrete system architecture (MVP → production), data & tooling choices, legal/privacy concerns, evaluation, and a suggested 90-day roadmap. I'll call the product "SpotBot" in examples.
+
+Reality check: status of the field (why this is hard)
+
+There are many commercial "AI content detectors" but they disagree a lot and have imperfect accuracy — detectors like GPTZero, QuillBot, Winston AI, PangramLabs, Sapling, etc., are commonly used today. Detection is an active arms race.
+
+Major model vendors (OpenAI, Google, Anthropic, etc.) are investing in provenance, watermarking, and metadata standards (e.g., C2PA / Content Credentials), but adoption is incomplete and not universal. That means provenance metadata will be very useful where present, but cannot be relied on for all content.
+
+Newer research shows fingerprinting and watermarking techniques exist, but there are also methods (fine-tuning, paraphrasing, "eraser" methods) that can remove or reduce fingerprints — so attribution is probabilistic and evolving. Expect false positives/negatives and adversarial removal attempts.
